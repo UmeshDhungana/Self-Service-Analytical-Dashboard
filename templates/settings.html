@@ -1,0 +1,99 @@
+{% extends "layouts/base_template.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+    <div>
+        <h1>Settings</h1>
+    </div>
+    <div >
+    <table class="table-striped table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Config</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for value in settings %}
+            <tr>
+                <td>{{ value[1] }}</td>
+                <td>{{ value[3] }}</td>
+                <td> <button class="btn btn-danger delete" value="{{ value[0] }}">Delete</button></td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    </div>
+    <form method="get" action="/storesettings">
+        <div class="form-group">
+            <select name="table" class="tableselection" name="table">
+                <option disabled selected>Choose</option>
+                {% for table in tables %}
+                    <option>{{table}}</option>
+                {% endfor %}
+            </select>
+
+        </div>
+        <div class="column-selection-div form-group">
+            <select class="js-example-basic-multiple column-selection" name="columns" multiple="multiple">
+
+            </select>
+{#            <button id="column-selected">Select</button>#}
+            <input type="button" value="Select" id="column-selected">
+        </div>
+        <div class="graph-selection-div form-group">
+            <select class="form-control graph-selection" name="graph">
+
+            </select>
+            <input type="submit" id="graph-selected" class="btn" value="Select">
+        </div>
+    </form>
+{% endblock%}
+{% block script %}
+<script>
+$(function(){
+    table_name = null
+    $(".column-selection-div").hide()
+    $(".graph-selection-div").hide()
+
+	$(".tableselection").on('change',function(e){
+		table_name = this.value
+        $(".graph-selection-div").hide()
+        $.get("/getTabledetails?table_name="+table_name, function (data, status) {
+            data_array = JSON.parse(data)
+            $(".column-selection-div").show()
+            $(".column-selection").html("")
+            for (data in data_array){
+                $(".column-selection").append("<option value='"+data+"' '>"+data + ": " + data_array[data]+"</option>")
+
+            }
+            $(".column-selection").select2()
+        })
+	})
+
+    $("#column-selected").on('click', function (e) {
+        selected_datas = $(".column-selection").select2('data')
+        /*for(i in selected_datas){
+            console.log(selected_datas[i]["text"])
+        }*/
+        if(Object.keys(selected_datas).length == 1 && selected_datas[0]["text"] == "date: datetime"){
+            $(".graph-selection-div").show()
+            $(".graph-selection").html("<option>bar</option> <option>line</option>")
+            {#$(".graph-selection").select2()#}
+        }
+    })
+
+    $(".delete").on('click', function (e) {
+        id_del = this.attributes.value.value
+        if(confirm("deleting "+ id_del)) {
+            $.get("/delete?id=" + id_del, function (data, status) {
+                window.location = "/settings"
+            })
+        }
+    })
+})
+</script>
+{% endblock%}
