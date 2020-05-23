@@ -2,55 +2,71 @@
 {% block title %}Settings{% endblock %}
 
 {% block content %}
-    <div>
-        <h1>Settings</h1>
-    </div>
-    <div >
-    <table class="table-striped table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Config</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for value in settings %}
-            <tr>
-                <td>{{ value[1] }}</td>
-                <td>{{ value[3] }}</td>
-                <td> <button class="btn btn-danger delete" value="{{ value[0] }}">Delete</button></td>
-            </tr>
-            {% endfor %}
-
-        </tbody>
-    </table>
-
-    </div>
-    <form method="get" action="/storesettings">
-        <div class="form-group">
-            <select name="table" class="tableselection" name="table">
-                <option disabled selected>Choose</option>
-                {% for table in tables %}
-                    <option>{{table}}</option>
+    <div class="container">
+        <div>
+            <h1>Settings</h1>
+        </div>
+        <div class="center-block">
+        <table class="table-striped table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Config</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for value in settings %}
+                <tr>
+                    <td>{{ value[1] }}</td>
+                    <td>{{ value[3] }}</td>
+                    <td> <button class="btn btn-danger delete" value="{{ value[0] }}">Delete</button></td>
+                </tr>
                 {% endfor %}
-            </select>
+
+            </tbody>
+        </table>
 
         </div>
-        <div class="column-selection-div form-group">
-            <select class="js-example-basic-multiple column-selection" name="columns" multiple="multiple">
+        <div>
+            <h1>Add New Graph on Dashboard</h1>
+            <form method="get" action="/storesettings" class="border">
+                <div class="form-group">
+                    <label for="text">Graph Name:</label>
+                    <input type="text" class="form-control" id="text" name="name">
+                </div>
 
-            </select>
-{#            <button id="column-selected">Select</button>#}
-            <input type="button" value="Select" id="column-selected">
-        </div>
-        <div class="graph-selection-div form-group">
-            <select class="form-control graph-selection" name="graph">
+                <div class="form-group">
+                    <label for="setting-table">Select table:</label>
+                    <select name="table" class="tableselection form-control" name="table" id="setting-table">
+                        <option disabled selected>Choose</option>
+                        {% for table in tables %}
+                            <option>{{table}}</option>
+                        {% endfor %}
+                    </select>
 
-            </select>
-            <input type="submit" id="graph-selected" class="btn" value="Select">
+                </div>
+                <div class="column-selection-div form-group">
+                    <label for="text">Columns:</label>
+                    <select class="js-example-basic-multiple column-selection form-control" name="columns" multiple="multiple">
+
+                    </select>
+                </div>
+                <div class="column-selection-div form-group">
+        {#            <button id="column-selected">Select</button>#}
+                    <input type="button" value="Select" id="column-selected">
+                </div>
+                <div class="graph-selection-div form-group">
+                    <select class="form-control graph-selection" name="graph">
+
+                    </select>
+                </div>
+                <div class="graph-selection-div form-group">
+                    <input type="submit" id="graph-selected" class="btn" value="Submit">
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 {% endblock%}
 {% block script %}
 <script>
@@ -79,9 +95,9 @@ $(function(){
         /*for(i in selected_datas){
             console.log(selected_datas[i]["text"])
         }*/
-        if(Object.keys(selected_datas).length == 1 && selected_datas[0]["text"] == "date: datetime"){
+        if(Object.keys(selected_datas).length == 1 && (selected_datas[0]["text"] == "date: datetime" || selected_datas[0]["text"] == "city: varchar" || selected_datas[0]["text"] == "state: varchar")){
             $(".graph-selection-div").show()
-            $(".graph-selection").html("<option>bar</option> <option>line</option>")
+            $(".graph-selection").html("<option>bar</option> <option>line</option><option>pie</option><option>doughnut</option>")
             {#$(".graph-selection").select2()#}
         }
     })

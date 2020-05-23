@@ -9,14 +9,27 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     settings = description.get_all_settings()
-    table_name = settings[0][1]
-    config = json.loads(settings[0][3])
-    legend = table_name
-    print(table_name)
-    labels, values = description.get_time_graph(table_name)
-    graph_type = config["graph"]
+    value_list = []
+    label_list = []
+    legend_list = []
+    graph_type_list = []
 
-    return render_template('index.html', values=values, labels=labels, legend=legend, graph_type=graph_type)
+    for setting in settings:
+        table_name = setting[1]
+        config = json.loads(setting[3])
+        legend = table_name
+        if(config["column"] =="date"):
+            labels, values = description.get_time_graph(table_name)
+        else:
+            labels, values = description.get_count(table_name, config["column"])
+        graph_type = config["graph"]
+
+        value_list.append(values)
+        label_list.append(labels)
+        legend_list.append(legend)
+        graph_type_list.append(graph_type)
+
+    return render_template('index.html', values=value_list, labels=label_list, legend=legend_list, graph_type=graph_type_list)
 
 
 

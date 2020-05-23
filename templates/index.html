@@ -3,29 +3,48 @@
 
 {% block content %}
 <div>
-	<h1>Graph 1</h1>
+
 </div>
     <!-- bar chart canvas element -->
-    <canvas id="myChart" width="600" height="400"></canvas>
-    <p id="pointSelected">Point selected:</p>
+    {% for i in range(0, labels|length)  %}
+        <div class="col-lg-6">
+            <canvas id="myChart-{{ i }}" width="600" height="400"></canvas>
+            <h3>Name</h3>
+        </div>
+    {% endfor %}
 {% endblock%}
 
+
+
 {% block script %}
+    {% for c in range(0, labels|length)  %}
 <script>
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+    colors = []
+    {% for label in labels[c] %}
+        colors.push(getRandomColor())
+    {% endfor %}
       // Global parameters:
       // do not resize the chart canvas when its container does (keep at 600x400px)
       Chart.defaults.global.responsive = false;
 
       // define the chart data
       var chartData = {
-        labels : [{% for item in labels %}
+        labels : [{% for item in labels[c] %}
                    "{{item}}",
                   {% endfor %}],
         datasets : [{
-            label: '{{ legend }}',
+            label: '{{ legend[c] }}',
             fill: true,
             lineTension: 0.1,
-            backgroundColor: "rgba(75,192,192,0.4)",
+            backgroundColor: colors,
             borderColor: "rgba(75,192,192,1)",
             borderCapStyle: 'butt',
             borderDash: [],
@@ -40,7 +59,7 @@
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data : [{% for item in values %}
+            data : [{% for item in values[c] %}
                       {{item}},
                     {% endfor %}],
             spanGaps: false
@@ -48,12 +67,12 @@
       }
 
       // get chart canvas
-      var holder = document.getElementById("myChart");
-      var ctx = document.getElementById("myChart").getContext("2d");
+      var holder = document.getElementById("{{"myChart-"+c|string}}");
+      var ctx = document.getElementById("{{"myChart-"+c|string}}").getContext("2d");
 
       // create the chart using the chart canvas
       var myChart = new Chart(ctx, {
-        type: '{{graph_type}}',
+        type: '{{ graph_type[c] }}',
         data: chartData,
         options: {
           tooltips: {
@@ -65,6 +84,20 @@
                      }
             }
           },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        userCallback: function(label, index, labels) {
+                            // when the floored value is the same as the value we have a whole number
+                            if (Math.floor(label) === label) {
+                                return label;
+                            }
+
+                        },
+                    }
+                }]
+            }
         }
       });
 
@@ -82,4 +115,5 @@
         pointSelected.innerHTML = 'Point selected... index: ' + activePoint[0]._index;
       };
 </script>
+    {% endfor %}
 {% endblock%}

@@ -40,4 +40,17 @@ def get_time_graph(table_name="verification"):
         values.append(data[0])
     return labels, values
 
+def get_count(table_name, column_name):
+    query = "select count(*), "+column_name+" from " + table_name + " group by "+ column_name
+    datas = select_executor(query)
+    labels = []
+    values = []
+    for data in datas:
+        labels.append(data[1])
+        values.append(data[0])
+    return labels, values
+
+print(get_count("registration", "city"))
+
+
 
