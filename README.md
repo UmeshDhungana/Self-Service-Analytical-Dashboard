@@ -1,11 +1,15 @@
 ## Synopsis
 
-Examples for using the Chart.js library in a Flask web application for creating line charts.
+Adjustable Graph on Dashboard
 
 ## How to Run
 
+
 In the top-level folder, run the development server:
-    % python app.py
+
+    1. Update DBUtils.py with database credentials
+    2. pip install -r requirements.txt
+    3. python app.py
 
 Go to your favorite web browser and open:
     http://locallhost:5000
@@ -14,6 +18,7 @@ Go to your favorite web browser and open:
 
 - Flask - web framework
 - Jinga2 - templating engine
+- ChartJs
 
-This application is written using Python 3.4.3.
+This application is written using Python 3.6
 

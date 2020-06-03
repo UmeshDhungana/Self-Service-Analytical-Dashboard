@@ -1,0 +1,34 @@
+{% extends "layouts/base_template.html" %}
+{% block title %}Upload CSV{% endblock %}
+upload-csv
+
+{% block content %}
+    <div class="container">
+        <div >
+            <form method="POST" action="/upload-csv" class="border" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="table">Table</label>
+                    <select name="table" class="form-control">
+                        <option>registration</option>
+                        <option>verification</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="text">CSV:</label>
+                    <input type="file" class="form-control" id="text" name="file">
+                </div>
+                <div class="form-group">
+                    {#            <button id="column-selected">Select</button>#}
+                    <input type="submit" value="Select" id="column-selected" class="btn btn-default">
+                </div>
+            </form>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+    $('.upload-csv').addClass("active")
+    </script>
+{% endblock %}

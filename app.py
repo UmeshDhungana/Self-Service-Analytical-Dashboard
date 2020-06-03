@@ -1,9 +1,14 @@
-from flask import Flask, jsonify, request, redirect
+from flask import Flask, jsonify, request, redirect, flash
 from flask import render_template
+from werkzeug.utils import secure_filename
+import os
+import pandas as pd
 from datetime import time
 from lib import description
+from DBUtils import engine
 import json
 
+UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 
 @app.route("/")
@@ -13,23 +18,31 @@ def index():
     label_list = []
     legend_list = []
     graph_type_list = []
+    description_list = []
+    ids = []
+
 
     for setting in settings:
         table_name = setting[1]
         config = json.loads(setting[3])
         legend = table_name
-        if(config["column"] =="date"):
-            labels, values = description.get_time_graph(table_name)
+        date = config["date"]
+        end_date = config["end_date"]
+        if table_name == "registration & verification":
+            labels, values = description.get_reg_vs_verif_count(date, end_date)
+        elif(config["column"] =="date"):
+            labels, values = description.get_time_graph(table_name, date, end_date)
         else:
-            labels, values = description.get_count(table_name, config["column"])
+            labels, values = description.get_count(table_name, config["column"], date, end_date)
         graph_type = config["graph"]
-
+        description_list.append(config["description"])
         value_list.append(values)
         label_list.append(labels)
         legend_list.append(legend)
         graph_type_list.append(graph_type)
+        ids.append(setting[0])
 
-    return render_template('index.html', values=value_list, labels=label_list, legend=legend_list, graph_type=graph_type_list)
+    return render_template('index.html', values=value_list, labels=label_list, legend=legend_list, graph_type=graph_type_list, description=description_list, ids=ids)
 
 
 
@@ -84,9 +97,15 @@ def time_chart():
 
 @app.route("/settings")
 def settings():
-    available_table = ["registration","verification"]
+    available_table = ["registration","verification", "registration & verification"]
     settings = description.get_all_settings()
-    return render_template('settings.html', tables=available_table, settings=settings )
+    edit_id = request.args.get("edit")
+    print("-------------", edit_id)
+    config = []
+    for setting in settings:
+        conf = json.loads(setting[3])
+        config.append(conf)
+    return render_template('settings.html', tables=available_table, settings=settings, config = zip(settings, config), edit_id=edit_id)
 
 @app.route("/getTabledetails")
 def getTableDetails():
@@ -99,10 +118,14 @@ def storesettings():
     table_name = request.args.get('table')
     column_name = request.args.get('columns')
     graph = request.args.get('graph')
+    desc = request.args.get('desc')
+    date = request.args.get('date')
+    end_date = request.args.get('end_date')
 
-    json_string = json.dumps({'column': column_name, 'graph': graph})
+    json_string = json.dumps({'column': column_name, 'graph': graph, 'description': desc, 'date': date, 'end_date': end_date})
 
     description.store_settings(table_name, json_string)
+    flash("New figure added")
     return redirect("/settings")
 
 @app.route("/delete", methods=["GET"])
@@ -111,5 +134,38 @@ def delete():
     description.delete(id)
     return jsonify({'status': 200})
 
+@app.route("/upload-csv", methods=["GET","POST"])
+def upload_csv():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        file = request.files['file']
+        table = request.form.get("table")
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file:
+            filename = secure_filename(file.filename)
+
+            full_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(full_path)
+            df = pd.read_csv(full_path)
+            df.to_sql(name=table, con=engine, index=False, if_exists='append')
+            flash("Upload successful")
+        else:
+            flash("file not found")
+    return render_template('uploadcsv.html')
+
+@app.route("/edit", methods=["POST","GET"])
+def edit():
+    graph = request.args.get('graph')
+    desc = request.args.get('desc')
+    id = request.args.get('id')
+    date = request.args.get('date')
+    end_date = request.args.get('end_date')
+    description.update(graph, desc, id, date, end_date)
+    flash("Edit successful")
+    return redirect("/settings")
+
+
 if __name__ == "__main__":
+    app.secret_key = 'jbsdakjsdbu73847364'
     app.run(debug=True)

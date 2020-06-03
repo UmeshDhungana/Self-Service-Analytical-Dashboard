@@ -20,14 +20,68 @@
         <script src='static/Chart.min.js'></script>
         <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+        <script src="https://npmcdn.com/Chart.Zoom.js@0.3.0/Chart.Zoom.min.js"></script>
+
     </head>
 
     <body>
-        {% include "layouts/navbar.html" %}
+        <header>
+            {% include "layouts/navbar.html" %}
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        {{message}}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <div id="content">
             {% block content %}{% endblock %}
         </div>
+
+        <!-- Footer -->
+<!--        <div id="footer">-->
+<!--         <div class="navbar navbar-inner  navbar-fixed-bottom">-->
+<!--&lt;!&ndash;            <footer class="page-footer font-small blue pt-4">&ndash;&gt;-->
+
+<!--&lt;!&ndash;                &lt;!&ndash; Footer Links &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="container-fluid text-center text-md-left">&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash; Footer Links &ndash;&gt;&ndash;&gt;-->
+
+<!--&lt;!&ndash;                &lt;!&ndash; Copyright &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="footer-copyright text-center py-3 footer-content" style="padding-top: 50px; padding-bottom: 50px">© 2020 Copyright:&ndash;&gt;-->
+<!--&lt;!&ndash;                    <a href=""> Dashly</a>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash; Copyright &ndash;&gt;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            </footer>&ndash;&gt;-->
+<!--             <footer class="d-flex justify-content-center mt-auto">-->
+<!--                <div class="d-flex justify-content-between col-md-8 col-md-offset-2 mb-3 mt-5">-->
+<!--                    &lt;!&ndash; Copyright Info &ndash;&gt;-->
+
+<!--                        <div class="align-centre">-->
+<!--                            © 2020 Copyright:-->
+<!--                            <a href=""> NOOS Technologies</a>-->
+<!--                        </div>-->
+<!--                    &lt;!&ndash; END Copyright Info &ndash;&gt;-->
+<!--                </div>-->
+<!--            </footer>-->
+<!--            &lt;!&ndash; END Footer &ndash;&gt;-->
+<!--         </div>-->
+<!--        </div>-->
+
+        <!-- Footer -->
+
+
 
          {% block script %}{% endblock %}
     </body>

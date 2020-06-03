@@ -1,4 +1,5 @@
 from mysql import connector
+from sqlalchemy import create_engine
 connection = cursor = None
 
 
@@ -15,4 +16,11 @@ try:
 
 except connector.Error as e:
     print("Error while connecting to MySQL", e)
+
+
+engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"
+                       .format(user="root",
+                               pw="root",
+                               db="noos"))
+
 

@@ -7,9 +7,12 @@
 </div>
     <!-- bar chart canvas element -->
     {% for i in range(0, labels|length)  %}
-        <div class="col-lg-6">
-            <canvas id="myChart-{{ i }}" width="600" height="400"></canvas>
-            <h3>Name</h3>
+        <div class="col-lg-4 col-md-6 col-sm-12 canvas-parent" style="padding-top: 20px">
+            <canvas id="myChart-{{ i }}" width="300" height="200" class="canvas"></canvas>
+            <h3>{{ description[i] }}</h3>
+            <a href="/settings?edit={{ ids[i] }}"><button> Edit</button></a>
+            <a id='download("myChart-{{ i }}")' download="filename.jpeg" class="download-button" style="display: none"><button id="download"> Download </button></a>
+
         </div>
     {% endfor %}
 {% endblock%}
@@ -17,16 +20,29 @@
 
 
 {% block script %}
+    <script>
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+
     {% for c in range(0, labels|length)  %}
 <script>
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
+
+
+    {#function download(id_name) {#}
+    {#    var url_base64 = document.getElementById(id_name).toDataURL('image/jpeg');#}
+    {#    $("#link").attr("href", url_base64)#}
+
+
+
+    $('.home').addClass("active")
+
     colors = []
     {% for label in labels[c] %}
         colors.push(getRandomColor())
@@ -41,7 +57,7 @@
                    "{{item}}",
                   {% endfor %}],
         datasets : [{
-            label: '{{ legend[c] }}',
+            {#label: '{{ legend[c] }}',#}
             fill: true,
             lineTension: 0.1,
             backgroundColor: colors,
@@ -75,12 +91,25 @@
         type: '{{ graph_type[c] }}',
         data: chartData,
         options: {
+            legend: {
+                display: false
+            },
+            pan: {
+                enabled: true,
+                mode: 'y',
+            },
+            zoom: {
+                enabled: true,
+                mode: 'y',
+            },
+            responsive: true,
           tooltips: {
             enabled: true,
             mode: 'single',
             callbacks: {
-              label: function(tooltipItems, data) {
-                       return tooltipItems.yLabel + ' degrees';
+              plabel: function(tooltipItems, data) {
+                        console.log(tooltipItems)
+                       return tooltipItems.yLabel;
                      }
             }
           },
@@ -98,22 +127,27 @@
                     }
                 }]
             }
-        }
+        },
       });
 
-      // get the text element below the chart
-      var pointSelected = document.getElementById("pointSelected");
-
-      // create a callback function for updating the selected index on the chart
-      holder.onclick = function(evt){
-        var activePoint = myChart.getElementAtEvent(evt);
-        console.log(activePoint);
-        console.log('x:' + activePoint[0]._view.x);
-        console.log('maxWidth: ' + activePoint[0]._xScale.maxWidth);
-        console.log('y: ' + activePoint[0]._view.y);
-        console.log('index: ' + activePoint[0]._index);
-        pointSelected.innerHTML = 'Point selected... index: ' + activePoint[0]._index;
-      };
 </script>
     {% endfor %}
+    <script>
+        $(function() {
+            function download() {
+                console.log("download function ran")
+                elements = document.getElementsByClassName("canvas-parent")
+
+                for (let i = 0; i < elements.length; i++) {
+                    var url_base64 = elements[i].children[1].toDataURL('image/jpeg')
+                    elements[i].children[4].setAttribute("href", url_base64)
+                }
+
+                $(".download-button").show()
+            }
+
+            setTimeout(function(){ download(); }, 5000);
+
+        })
+    </script>
 {% endblock%}
