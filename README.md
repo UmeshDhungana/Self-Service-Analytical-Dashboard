@@ -1,6 +1,7 @@
 ## Synopsis
 
-Adjustable Graph on Dashboard
+Self serviceable analytical dashboard
+This project self-serviceable analytics dashboard through which the user can create different kinds of figure (graphs, charts, etc.) from available data in. User can also import data externally through CSV file. User can also edit or delete figures from dashboard as per their need. This project was done in Python and chartJS was used for figures.
 
 ## How to Run
 
